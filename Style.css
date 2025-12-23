@@ -1,0 +1,156 @@
+:root {
+    --bg-color: #1a1a1a;
+    --board-shadow: rgba(0, 0, 0, 0.7);
+    --white-cell: #decba4;
+    --black-cell: #5d4037;
+    --accent: #f1c40f;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+    color: #ecf0f1;
+    margin: 0;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+h1 {
+    font-weight: 200;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+/* Pannello Controlli */
+#setup {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.control-group { display: flex; align-items: center; gap: 10px; }
+
+select {
+    background: #2c3e50;
+    color: white;
+    border: 1px solid #455a64;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Scacchiera */
+#game-container {
+    padding: 12px;
+    background: #3e2723;
+    border-radius: 8px;
+    box-shadow: 0 30px 60px var(--board-shadow);
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
+    border: 4px solid #2b1d1a;
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.white-cell { background-color: var(--white-cell); }
+.black-cell { background-color: var(--black-cell); }
+
+.hint-dot {
+    width: 16px;
+    height: 16px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+/* Pedine */
+.piece {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    position: absolute;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+    z-index: 10;
+}
+
+.white-piece {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #dcdde1 100%);
+    box-shadow: 0 4px 0 #95a5a6, 0 8px 15px rgba(0,0,0,0.4);
+    color: #2f3640;
+}
+
+.black-piece {
+    background: radial-gradient(circle at 35% 35%, #485460 0%, #101010 100%);
+    box-shadow: 0 4px 0 #000000, 0 8px 15px rgba(0,0,0,0.6);
+    color: var(--accent);
+}
+
+.piece-selected {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 15px 30px rgba(241, 196, 15, 0.4) !important;
+}
+
+@keyframes piece-landing {
+    0% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* UI Info */
+#scoreboard { display: flex; gap: 20px; margin-bottom: 15px; }
+
+.score-box {
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+button {
+    margin-top: 25px;
+    background: transparent;
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 10px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+@media (max-width: 500px) {
+    #board { grid-template-columns: repeat(8, 11vw); grid-template-rows: repeat(8, 11vw); }
+    .cell { width: 11vw; height: 11vw; }
+    .piece { width: 9vw; height: 9vw; }
+}

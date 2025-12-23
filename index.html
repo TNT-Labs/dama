@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dama PWA PRO</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body>
+    <h1>Dama PWA PRO</h1>
+    
+    <div id="setup">
+        <div class="control-group">
+            <label for="game-mode">Modalità:</label>
+            <select id="game-mode" onchange="resetGame()">
+                <option value="1vs1">1vs1 Locale</option>
+                <option value="1vsCPU">Giocatore vs CPU</option>
+            </select>
+        </div>
+        <div id="difficulty-container" class="control-group" style="display: none;">
+            <label for="difficulty">Intelligenza:</label>
+            <select id="difficulty" onchange="resetGame()">
+                <option value="easy">Semplice (Casuale)</option>
+                <option value="hard">Avanzata (Strategica)</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="scoreboard">
+        <div class="score-box">Bianchi: <span id="white-count">12</span></div>
+        <div class="score-box">Neri: <span id="black-count">12</span></div>
+    </div>
+
+    <div id="draw-counter" style="margin-bottom: 10px; font-size: 0.8rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;">
+        Mosse alla patta: <span id="moves-to-draw">40</span>
+    </div>
+
+    <div id="game-container">
+        <div id="board"></div>
+    </div>
+
+    <div id="status">TURNO: <span id="current-player" style="color: #f1c40f; font-weight: bold;">BIANCO</span></div>
+    
+    <button onclick="resetGame()">Ricomincia Partita</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
