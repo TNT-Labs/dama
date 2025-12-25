@@ -1,5 +1,5 @@
 // Versione dell'app - incrementa questo numero ad ogni release
-const APP_VERSION = 'v1.0.0';
+const APP_VERSION = 'v1.0.1';
 const CACHE_NAME = `dama-${APP_VERSION}`;
 const ASSETS = [
   './',
