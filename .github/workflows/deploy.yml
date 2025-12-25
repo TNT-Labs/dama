@@ -1,0 +1,102 @@
+name: Auto Deploy e Update
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Auto-increment version
+        id: version
+        run: |
+          # Legge la versione corrente dal sw.js
+          CURRENT_VERSION=$(grep -oP "const APP_VERSION = '\Kv[0-9]+\.[0-9]+\.[0-9]+" sw.js)
+          echo "Versione corrente: $CURRENT_VERSION"
+
+          # Incrementa la versione patch
+          IFS='.' read -ra VERSION_PARTS <<< "${CURRENT_VERSION#v}"
+          MAJOR="${VERSION_PARTS[0]}"
+          MINOR="${VERSION_PARTS[1]}"
+          PATCH="${VERSION_PARTS[2]}"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+
+          echo "Nuova versione: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # Aggiorna la versione nel sw.js
+          sed -i "s/const APP_VERSION = '${CURRENT_VERSION}'/const APP_VERSION = '${NEW_VERSION}'/" sw.js
+
+          # Aggiorna anche la versione nel manifest.json se presente
+          if [ -f manifest.json ]; then
+            if grep -q "\"version\"" manifest.json; then
+              sed -i "s/\"version\": \".*\"/\"version\": \"${NEW_VERSION}\"/" manifest.json
+            else
+              # Aggiunge il campo version se non esiste
+              sed -i "2i\  \"version\": \"${NEW_VERSION}\"," manifest.json
+            fi
+          fi
+
+      - name: Commit version update
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if git diff --quiet; then
+            echo "Nessuna modifica alla versione"
+          else
+            git add sw.js manifest.json
+            git commit -m "🚀 Auto-update versione a ${{ steps.version.outputs.new_version }}"
+            git push
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          release_name: Release ${{ steps.version.outputs.new_version }}
+          body: |
+            🎮 Nuova versione della Dama PWA!
+
+            **Versione**: ${{ steps.version.outputs.new_version }}
+            **Deploy automatico**: ✅
+
+            L'applicazione si aggiornerà automaticamente sui dispositivi degli utenti.
+          draft: false
+          prerelease: false
+        continue-on-error: true

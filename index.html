@@ -49,5 +49,50 @@
     <button onclick="resetGame()">Ricomincia Partita</button>
 
     <script src="script.js"></script>
+    <script>
+        // Registrazione e gestione aggiornamenti automatici del Service Worker
+        if ('serviceWorker' in navigator) {
+            let refreshing = false;
+
+            // Rileva quando il nuovo service worker prende il controllo
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                console.log('[App] Nuova versione attivata, ricarico la pagina...');
+                window.location.reload();
+            });
+
+            // Registra il service worker
+            navigator.serviceWorker.register('./sw.js')
+                .then((registration) => {
+                    console.log('[App] Service Worker registrato con successo:', registration);
+
+                    // Controlla aggiornamenti ogni 60 secondi
+                    setInterval(() => {
+                        registration.update();
+                    }, 60000);
+
+                    // Gestisce l'evento quando è disponibile un aggiornamento
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('[App] Nuovo Service Worker trovato, installazione in corso...');
+
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[App] Nuova versione disponibile!');
+                                // Il nuovo service worker è installato ma in attesa
+                                // skipWaiting() sarà chiamato automaticamente nel sw.js
+                            }
+                        });
+                    });
+
+                    // Controlla immediatamente se c'è un aggiornamento disponibile
+                    registration.update();
+                })
+                .catch((error) => {
+                    console.error('[App] Errore nella registrazione del Service Worker:', error);
+                });
+        }
+    </script>
 </body>
 </html>
